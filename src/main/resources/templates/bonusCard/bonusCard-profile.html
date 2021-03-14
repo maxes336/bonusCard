@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Bonus Card Profile</title>
+</head>
+<body>
+<h2>Bonus Card Profile</h2>
+<form action="#" th:action="@{/bonusCards/card-profile}" th:object="${bonusCardToUpdate}" method="post"><br>
+    <div>
+        <label for="id">ID:</label>
+        <input readonly type="text" th:field="*{id}" id="id" placeholder="ID">
+    </div>
+    <br>
+
+    <div>
+        <label>Balance:</label><br>
+        <input type="text" th:field="*{balance}">
+    </div>
+    <br>
+
+    <div>
+        <label>Status of card:</label><br>
+        <select th:field="*{statusOfCard}">
+            <option th:value="active">Active</option>
+            <option th:value="inactive">Inactive</option>
+            <option th:value="expired">Expired</option>
+        </select>
+    </div>
+    <br>
+
+    <div>
+        <label>Validity period:</label><br>
+        <input type="radio" th:field="*{validityPeriod}" value="1"> 1 month<br>
+        <input type="radio" th:field="*{validityPeriod}" value="6"> 6 months<br>
+        <input type="radio" th:field="*{validityPeriod}" value="12"> 12 months<br>
+    </div>
+    <br>
+
+    <button onclick="location.href='http://localhost:8080/bonusCards'" type="button"><-Back</button>
+    <input type="submit" value="Save changes">
+    <button onclick="location.href='http://localhost:8080/bonusCards/delete/*{id}'" type="button">Delete card</button>
+</form>
+<h3>Transactions</h3>
+<table>
+    <thead>
+    <tr>
+        <th>UUID_________________________________</th>
+        <th>Amount___</th>
+        <th>Timestamp of transaction_______________</th>
+        <th>Card ID</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="transaction : ${transactions}">
+        <td th:text="${transaction.id}"></td>
+        <td th:text="${transaction.amount}"></td>
+        <td th:text="${transaction.timestampOfTransaction}"></td>
+        <td th:text="${transaction.bonusCard}"></td>
+        <td><a th:href="@{/bonusCards/card-profile/{id}(id=${bonusCard.id})}">Create transaction</a></td>
+        <td><a th:href="@{/bonusCards/delete/{id}(id=${bonusCard.id})}">Delete transaction</a></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

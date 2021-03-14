@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Bonus Cards</title>
+</head>
+<body>
+<div th:switch="${bonusCards}">
+    <h2 th:case="null">No bonus cards found!</h2>
+    <div th:case="*">
+        <h2>Bonus Cards</h2>
+        <div>Find by validity period:</div>
+        <form th:action="@{/bonusCards/filter}" method="post">
+            <select th:name="filter">
+                <option th:value="0">Select a period:</option>
+                <option th:value="1">1 month</option>
+                <option th:value="6">6 months</option>
+                <option th:value="12">12 months</option>
+            </select>
+            <button type="submit">Find</button>
+            <button onclick="location.href='http://localhost:8080/bonusCards'" type="button">Clear filter</button>
+        </form><br>
+        <table>
+            <thead>
+            <tr>
+                <th>Id___</th>
+                <!--<th>Number___</th>-->
+                <th>Issue date_______________</th>
+                <th>Valid thru_______________</th>
+                <!--<th>Last use___</th>-->
+                <th>Balance___</th>
+                <th>Status___</th>
+                <th>Validity period</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="bonusCard : ${bonusCards}">
+                <td th:text="${bonusCard.id}"></td>
+                <!--<td th:text="${bonusCard.cardNumber}"></td>-->
+                <td th:text="${bonusCard.cardIssueDate}"></td>
+                <td th:text="${bonusCard.cardValidThru}"></td>
+                <!--<td th:text="${bonusCard.cardLastUse}"></td>-->
+                <td th:text="${bonusCard.balance}"></td>
+                <td th:text="${bonusCard.statusOfCard}"></td>
+                <td th:text="${bonusCard.validityPeriod}"></td>
+                <td><a th:href="@{/bonusCards/card-profile/{id}(id=${bonusCard.id})}">Change</a></td>
+                <td><a th:href="@{/bonusCards/delete/{id}(id=${bonusCard.id})}">Delete</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <br>
+    <button onclick="location.href='http://localhost:8080/bonusCards/create'" type="button">Create new card</button>
+    <br>
+</div>
+<br>
+<div>
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Sign Out"/>
+    </form>
+</div>
+</body>
+</html>
