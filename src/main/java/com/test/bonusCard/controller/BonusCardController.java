@@ -1,6 +1,7 @@
 package com.test.bonusCard.controller;
 
 import com.test.bonusCard.model.BonusCard;
+import com.test.bonusCard.model.Transaction;
 import com.test.bonusCard.service.BonusCardService;
 import com.test.bonusCard.service.TransactionService;
 import org.springframework.stereotype.Controller;
@@ -58,14 +59,17 @@ public class BonusCardController {
     }
 
     @GetMapping("/card-profile/{id}")
-    public String bonusCardProfile(@PathVariable("id") Long id, Model model) {
+    public String bonusCardProfile(@PathVariable("id") Long id, Model cardModel, Model transactionModel) {
         BonusCard bonusCardToUpdate = bonusCardService.findById(id);
-        model.addAttribute("bonusCardToUpdate", bonusCardToUpdate);
+        cardModel.addAttribute("bonusCardToUpdate", bonusCardToUpdate);
+        List<Transaction> transactions = transactionService.findByBonusCard(bonusCardToUpdate);
+        transactionModel.addAttribute("transactions", transactions);
         return "bonusCard/bonusCard-profile";
     }
 
     @PostMapping("/card-profile")
     public String updateBonusCard(BonusCard bonusCard) {
+        transactionService.createNewTransaction(bonusCard);
         bonusCardService.updateBonusCard(bonusCard);
         return "redirect:/bonusCards";
     }

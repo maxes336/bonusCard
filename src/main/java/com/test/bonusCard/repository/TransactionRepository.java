@@ -10,5 +10,5 @@ import java.util.UUID;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
-    List<Transaction> findByCardId(Long cardId);
+    List<Transaction> findByBonusCard(BonusCard bonusCard);
 }

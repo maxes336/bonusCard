@@ -18,8 +18,8 @@ import java.util.UUID;
 @Table(name = "transaction")
 public class Transaction {
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @GeneratedValue//(generator = "UUID")
+    //@GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
@@ -30,12 +30,16 @@ public class Transaction {
     @Column(updatable = false, nullable = false)
     private Timestamp timestampOfTransaction;
 
-    @Column(name = "card_id", updatable = false, nullable = false)
-    private Long cardId;
+    /*@Column(name = "card_id", updatable = false, nullable = false)
+    private Long cardId;*/
 
-    /*@ManyToOne
+    @ManyToOne
     @JoinColumn(name = "bonusCard_id")
-    private BonusCard bonusCard;*/
+    private BonusCard bonusCard;
+
+    public Transaction(Long amountOfTransaction) {
+        this.amount = amountOfTransaction;
+    }
 
     /*public Transaction(Long amount, BonusCard bonusCard) {
         this.amount = amount;

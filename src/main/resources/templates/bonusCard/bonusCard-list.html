@@ -12,7 +12,8 @@
         <div>Find by validity period:</div>
         <form th:action="@{/bonusCards/filter}" method="post">
             <select th:name="filter">
-                <option th:value="0">Select a period:</option>
+                <option th:value="-1">Select a period:</option>
+                <option th:value="0">No Limit</option>
                 <option th:value="1">1 month</option>
                 <option th:value="6">6 months</option>
                 <option th:value="12">12 months</option>
@@ -43,7 +44,7 @@
                 <td th:text="${bonusCard.balance}"></td>
                 <td th:text="${bonusCard.statusOfCard}"></td>
                 <td th:text="${bonusCard.validityPeriod}"></td>
-                <td><a th:href="@{/bonusCards/card-profile/{id}(id=${bonusCard.id})}">Change</a></td>
+                <td><a th:href="@{/bonusCards/card-profile/{id}(id=${bonusCard.id})}">Profile</a></td>
                 <td><a th:href="@{/bonusCards/delete/{id}(id=${bonusCard.id})}">Delete</a></td>
             </tr>
             </tbody>

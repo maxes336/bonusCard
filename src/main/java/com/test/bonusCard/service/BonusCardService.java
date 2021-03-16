@@ -26,7 +26,7 @@ public class BonusCardService {
     }
 
     public List<BonusCard> findByValidityPeriod(int validityPeriod) {
-        if (validityPeriod != 0) {
+        if (validityPeriod != -1) {
             return bonusCardRepository.findByValidityPeriod(validityPeriod);
         } else {
             return bonusCardRepository.findAll();
@@ -37,6 +37,7 @@ public class BonusCardService {
         if (numberOfCardsToCreate > 0) {
             setDateAndTimeOfCreation(bonusCard);
             setExpirationDateOfBonusCard(bonusCard);
+            setBalanceOfCardAsZeroIfItIsNull(bonusCard);
             bonusCardRepository.save(bonusCard);
             for (int i = 1; i < numberOfCardsToCreate; i++) {
                 bonusCardRepository.save(copyNewBonusCard(bonusCard));
@@ -44,14 +45,15 @@ public class BonusCardService {
         }
     }
 
-    public void saveOneBonusCard(BonusCard bonusCard) {
+    /*public void saveOneBonusCard(BonusCard bonusCard) {
         bonusCardRepository.save(bonusCard);
-    }
+    }*/
 
     public void updateBonusCard(BonusCard bonusCard) {
         BonusCard originalCard = findById(bonusCard.getId());
         bonusCard.setCardIssueDate(originalCard.getCardIssueDate());
         setExpirationDateOfBonusCard(bonusCard);
+        setBalanceOfCardAsZeroIfItIsNull(bonusCard);
         bonusCardRepository.save(bonusCard);
     }
 
@@ -79,19 +81,30 @@ public class BonusCardService {
     }
 
     public void setExpirationDateOfBonusCard(BonusCard bonusCard) {
-        DateFormat dateFormat = new SimpleDateFormat("dd/MMM/yyyy HH:mm:ss", Locale.ENGLISH);
-        Date dateAndTimeOfCardCreation = null;
-        try {
-            dateAndTimeOfCardCreation = dateFormat.parse(bonusCard.getCardIssueDate());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        if (dateAndTimeOfCardCreation != null) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(dateAndTimeOfCardCreation);
-            cal.add(Calendar.MONTH, bonusCard.getValidityPeriod());
-            bonusCard.setCardValidThru(dateFormat.format(cal.getTime()));
+        if (bonusCard.getValidityPeriod() == 0) {
+            bonusCard.setCardValidThru(null);
+        } else {
+            DateFormat dateFormat = new SimpleDateFormat("dd/MMM/yyyy HH:mm:ss", Locale.ENGLISH);
+            Date dateAndTimeOfCardCreation = null;
+            try {
+                dateAndTimeOfCardCreation = dateFormat.parse(bonusCard.getCardIssueDate());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if (dateAndTimeOfCardCreation != null) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(dateAndTimeOfCardCreation);
+                cal.add(Calendar.MONTH, bonusCard.getValidityPeriod());
+                bonusCard.setCardValidThru(dateFormat.format(cal.getTime()));
+            }
         }
     }
+
+    public void setBalanceOfCardAsZeroIfItIsNull(BonusCard bonusCard) {
+        if (bonusCard.getBalance() == null) {
+            bonusCard.setBalance(0L);
+        }
+    }
+
 
 }

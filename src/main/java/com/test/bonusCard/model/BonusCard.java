@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 //@SequenceGenerator(name = "card_number_seq", initialValue = 1001, allocationSize = 100)
 @Table(name = "test")
-public class BonusCard implements Serializable {
+public class BonusCard {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -37,8 +37,11 @@ public class BonusCard implements Serializable {
 
     private Long balance;
 
-    /*@OneToMany(mappedBy = "bonusCard", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Transaction> transactions;*/
+    @OneToMany(mappedBy = "bonusCard",
+            cascade = CascadeType.ALL
+            //orphanRemoval = true
+    )
+    private List<Transaction> transactions;
 
     @Column(name = "status")
     private String statusOfCard;

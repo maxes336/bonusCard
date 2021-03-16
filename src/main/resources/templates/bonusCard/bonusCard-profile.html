@@ -15,7 +15,7 @@
 
     <div>
         <label>Balance:</label><br>
-        <input type="text" th:field="*{balance}">
+        <input type="number" th:field="*{balance}">
     </div>
     <br>
 
@@ -37,9 +37,16 @@
     </div>
     <br>
 
-    <button onclick="location.href='http://localhost:8080/bonusCards'" type="button"><-Back</button>
+    <button th:onclick="location.href='http://localhost:8080/bonusCards'" type="button"><-Back</button>
     <input type="submit" value="Save changes">
-    <button onclick="location.href='http://localhost:8080/bonusCards/delete/*{id}'" type="button">Delete card</button>
+    <a th:href="@{/bonusCards/delete/{id}(id=${bonusCardToUpdate.id})}">
+        <button type="button">Delete card</button>
+    </a>
+
+    <!--
+        <td><a th:href="@{/bonusCards/delete/{id}(id=${bonusCard.id})}">Delete</a></td>
+    -->
+
 </form>
 <h3>Transactions</h3>
 <table>
@@ -57,8 +64,10 @@
         <td th:text="${transaction.amount}"></td>
         <td th:text="${transaction.timestampOfTransaction}"></td>
         <td th:text="${transaction.bonusCard}"></td>
+<!--
         <td><a th:href="@{/bonusCards/card-profile/{id}(id=${bonusCard.id})}">Create transaction</a></td>
         <td><a th:href="@{/bonusCards/delete/{id}(id=${bonusCard.id})}">Delete transaction</a></td>
+-->
     </tr>
     </tbody>
 </table>
