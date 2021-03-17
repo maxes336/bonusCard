@@ -33,7 +33,7 @@ public class Transaction {
     /*@Column(name = "card_id", updatable = false, nullable = false)
     private Long cardId;*/
 
-    @ManyToOne
+    @ManyToOne(targetEntity = BonusCard.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "bonusCard_id")
     private BonusCard bonusCard;
 

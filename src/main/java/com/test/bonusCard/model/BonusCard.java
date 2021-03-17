@@ -37,8 +37,10 @@ public class BonusCard {
 
     private Long balance;
 
-    @OneToMany(mappedBy = "bonusCard",
-            cascade = CascadeType.ALL
+    @OneToMany(
+            targetEntity = Transaction.class,
+            mappedBy = "bonusCard"
+            //cascade = CascadeType.ALL
             //orphanRemoval = true
     )
     private List<Transaction> transactions;
