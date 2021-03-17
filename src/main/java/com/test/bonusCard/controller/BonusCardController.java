@@ -59,11 +59,9 @@ public class BonusCardController {
     }
 
     @GetMapping("/card-profile/{id}")
-    public String bonusCardProfile(@PathVariable("id") Long id, Model cardModel, Model transactionModel) {
+    public String bonusCardProfile(@PathVariable("id") Long id, Model model) {
         BonusCard bonusCardToUpdate = bonusCardService.findById(id);
-        cardModel.addAttribute("bonusCardToUpdate", bonusCardToUpdate);
-        List<Transaction> transactions = transactionService.findByBonusCard(bonusCardToUpdate);
-        transactionModel.addAttribute("transactions", transactions);
+        model.addAttribute("bonusCardToUpdate", bonusCardToUpdate);
         return "bonusCard/bonusCard-profile";
     }
 

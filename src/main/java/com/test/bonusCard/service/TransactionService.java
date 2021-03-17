@@ -24,13 +24,13 @@ public class TransactionService {
     }
 
     public List<Transaction> findByBonusCard(BonusCard bonusCard) {
-        return transactionRepository.findByBonusCard(bonusCard);
+        return transactionRepository.findByBonusCardId(bonusCard.getId());
     }
 
     public void createNewTransaction(BonusCard bonusCard) {
         Long amountOfTransaction = findAmountOfTransaction(bonusCard);
         if (amountOfTransaction != 0) {
-            transactionRepository.save(new Transaction(amountOfTransaction));
+            transactionRepository.save(new Transaction(amountOfTransaction, bonusCard));
         }
     }
 
@@ -38,7 +38,7 @@ public class TransactionService {
         setBalanceOfCardAsZeroIfItIsNull(bonusCard);
         Long balanceOfThisCardInRepository = bonusCardRepository.getOne(bonusCard.getId()).getBalance();
         Long balanceOfThisCardInOperation = bonusCard.getBalance();
-        return Math.abs(balanceOfThisCardInRepository-balanceOfThisCardInOperation);
+        return -(balanceOfThisCardInRepository-balanceOfThisCardInOperation);
     }
 
     public void setBalanceOfCardAsZeroIfItIsNull(BonusCard bonusCard) {

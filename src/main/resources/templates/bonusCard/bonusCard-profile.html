@@ -52,18 +52,18 @@
 <table>
     <thead>
     <tr>
-        <th>UUID_________________________________</th>
+        <th>UUID________________________________________</th>
         <th>Amount___</th>
-        <th>Timestamp of transaction_______________</th>
+        <th>Timestamp of transaction___</th>
         <th>Card ID</th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each="transaction : ${transactions}">
+    <tr th:each="transaction : ${bonusCardToUpdate.transactions}">
         <td th:text="${transaction.id}"></td>
         <td th:text="${transaction.amount}"></td>
         <td th:text="${transaction.timestampOfTransaction}"></td>
-        <td th:text="${transaction.bonusCard}"></td>
+        <td th:text="${transaction.bonusCard.id}"></td>
 <!--
         <td><a th:href="@{/bonusCards/card-profile/{id}(id=${bonusCard.id})}">Create transaction</a></td>
         <td><a th:href="@{/bonusCards/delete/{id}(id=${bonusCard.id})}">Delete transaction</a></td>

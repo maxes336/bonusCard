@@ -1,16 +1,15 @@
 package com.test.bonusCard.model;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.sun.istack.Nullable;
+import lombok.*;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
 
 @Data
+@RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -26,9 +25,11 @@ public class BonusCard {
     private Long cardNumber;*/
 
     //@CreationTimestamp
+    @NonNull
     @Column(name = "issue_date", nullable = false, updatable = false)
     private String cardIssueDate;
 
+    @Nullable
     @Column(name = "valid_thru")
     private String cardValidThru;
 
@@ -38,26 +39,32 @@ public class BonusCard {
     private Long balance;
 
     @OneToMany(
-            targetEntity = Transaction.class,
-            mappedBy = "bonusCard"
-            //cascade = CascadeType.ALL
-            //orphanRemoval = true
+            mappedBy = "bonusCard",
+            cascade = CascadeType.REMOVE
+            //orphanRemoval = true ????????
     )
     private List<Transaction> transactions;
 
+    @NonNull
     @Column(name = "status")
     private String statusOfCard;
 
+    @NonNull
     @Column(name = "validity_period")
     private int validityPeriod;
 
-    public BonusCard(String cardIssueDate, String cardValidThru, Long balance, String statusOfCard, int validityPeriod) {
+
+    public BonusCard(
+            String cardIssueDate,
+            String cardValidThru,
+            Long balance,
+            String statusOfCard,
+            int validityPeriod
+    ) {
         this.cardIssueDate = cardIssueDate;
         this.cardValidThru = cardValidThru;
         this.balance = balance;
         this.statusOfCard = statusOfCard;
         this.validityPeriod = validityPeriod;
     }
-
-
 }

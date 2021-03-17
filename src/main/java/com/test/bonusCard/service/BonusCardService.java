@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Service
 public class BonusCardService {
@@ -22,14 +19,18 @@ public class BonusCardService {
     }
 
     public List<BonusCard> findAll() {
-        return bonusCardRepository.findAll();
+        List<BonusCard> allBonusCardsFromRepository = bonusCardRepository.findAll();
+        sortListOfBonusCardsById(allBonusCardsFromRepository);
+        return allBonusCardsFromRepository;
     }
 
     public List<BonusCard> findByValidityPeriod(int validityPeriod) {
         if (validityPeriod != -1) {
-            return bonusCardRepository.findByValidityPeriod(validityPeriod);
+            List<BonusCard> bonusCardsFoundedByValidityPeriod = bonusCardRepository.findByValidityPeriod(validityPeriod);
+            sortListOfBonusCardsById(bonusCardsFoundedByValidityPeriod);
+            return bonusCardsFoundedByValidityPeriod;
         } else {
-            return bonusCardRepository.findAll();
+            return findAll();
         }
     }
 
@@ -49,12 +50,12 @@ public class BonusCardService {
         bonusCardRepository.save(bonusCard);
     }*/
 
-    public void updateBonusCard(BonusCard bonusCard) {
-        BonusCard originalCard = findById(bonusCard.getId());
-        bonusCard.setCardIssueDate(originalCard.getCardIssueDate());
-        setExpirationDateOfBonusCard(bonusCard);
-        setBalanceOfCardAsZeroIfItIsNull(bonusCard);
-        bonusCardRepository.save(bonusCard);
+    public void updateBonusCard(BonusCard updatedBonusCard) {
+        BonusCard originalCard = findById(updatedBonusCard.getId());
+        updatedBonusCard.setCardIssueDate(originalCard.getCardIssueDate());
+        setExpirationDateOfBonusCard(updatedBonusCard);
+        setBalanceOfCardAsZeroIfItIsNull(updatedBonusCard);
+        bonusCardRepository.save(updatedBonusCard);
     }
 
     public BonusCard findById(Long id) {
@@ -104,6 +105,10 @@ public class BonusCardService {
         if (bonusCard.getBalance() == null) {
             bonusCard.setBalance(0L);
         }
+    }
+
+    public void sortListOfBonusCardsById(List<BonusCard> bonusCards){
+        bonusCards.sort(Comparator.comparingLong(BonusCard::getId));
     }
 
 
