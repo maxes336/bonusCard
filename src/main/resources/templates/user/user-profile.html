@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile</title>
+</head>
+<body>
+<h2>User Profile</h2>
+<form action="#" th:action="@{/user/user-profile}" th:object="${userAccountToUpdate}" method="post"><br>
+    <div>
+        <label for="username">Username:</label>
+        <input readonly type="text" th:field="*{username}" id="username" placeholder="Username">
+    </div>
+    <br>
+
+    <div>
+        <label for="password">New Password:</label><br>
+        <input type="password" th:field="*{password}" id="password" placeholder="Type here to change pass">
+    </div>
+    <br>
+
+    <div>
+        <label>Account is active?:</label><br>
+        <select th:field="*{isActive}">
+            <option th:value="true">Active</option>
+            <option th:value="false">Inactive</option>
+        </select>
+    </div>
+    <br>
+
+    <div>
+        <label>Role:</label><br>
+        <input type="radio" th:field="*{role}" value="USER">User<br>
+        <input type="radio" th:field="*{role}" value="MODERATOR">Moderator<br>
+    </div>
+    <br>
+
+    <button th:onclick="location.href='http://localhost:8080/user/user-list'" type="button"><-Back</button>
+    <input type="submit" value="Save changes">
+    <a th:href="@{/user/delete/{id}(id=${userAccountToUpdate.id})}">
+        <button type="button">Delete account</button>
+    </a>
+
+</form>
+<h3>Bonus cards belong to this account:</h3>
+<table>
+    <thead>
+    <tr>
+        <th>ID___</th>
+        <th>Issue date_______________</th>
+        <th>Valid thru_______________</th>
+        <th>Last use_______________</th>
+        <th>Balance___</th>
+        <th>Status___</th>
+        <th>Validity period</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="bonusCard : ${userAccountToUpdate.bonusCards}">
+        <td th:text="${bonusCard.id}"></td>
+        <td th:text="${bonusCard.cardIssueDate}"></td>
+        <td th:text="${bonusCard.cardValidThru}"></td>
+        <td th:text="${bonusCard.cardLastUse}"></td>
+        <td th:text="${bonusCard.balance}"></td>
+        <td th:text="${bonusCard.statusOfCard}"></td>
+        <td th:text="${bonusCard.validityPeriod}"></td>
+        <td><a th:href="@{/bonusCards/card-profile/{id}(id=${bonusCard.id})}">Profile</a></td>
+        <td><a th:href="@{/bonusCards/delete/{id}(id=${bonusCard.id})}">Delete</a></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

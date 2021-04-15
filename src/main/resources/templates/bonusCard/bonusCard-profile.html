@@ -6,7 +6,7 @@
 </head>
 <body>
 <h2>Bonus Card Profile</h2>
-<form action="#" th:action="@{/bonusCards/card-profile}" th:object="${bonusCardToUpdate}" method="post"><br>
+<form action="#" th:action="@{/bonusCards/card-profile/{id}(id=${bonusCardToUpdate.id})}" th:object="${bonusCardToUpdate}" method="post"><br>
     <div>
         <label for="id">ID:</label>
         <input readonly type="text" th:field="*{id}" id="id" placeholder="ID">
@@ -15,7 +15,7 @@
 
     <div>
         <label>Balance:</label><br>
-        <input type="number" th:field="*{balance}">
+        <input type="text" th:field="*{balance}">
     </div>
     <br>
 

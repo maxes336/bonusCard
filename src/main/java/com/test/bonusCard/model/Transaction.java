@@ -24,7 +24,7 @@ public class Transaction {
 
     @Column(updatable = false, nullable = false)
     @NonNull
-    private Long amount;
+    private Double amount;
 
     @CreationTimestamp
     @Column(updatable = false, nullable = false)
@@ -35,5 +35,13 @@ public class Transaction {
     @NonNull
     private BonusCard bonusCard;
 
-
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id=" + id +
+                ", amount=" + amount +
+                ", timestampOfTransaction=" + timestampOfTransaction +
+                ", bonusCard=" + bonusCard.getId() +
+                '}';
+    }
 }

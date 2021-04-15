@@ -10,4 +10,5 @@ import java.util.List;
 public interface BonusCardRepository extends JpaRepository<BonusCard, Long> {
 
     List<BonusCard> findByValidityPeriod(int validityPeriod);
+    //BonusCard findByCardNumber(Long cardNumber);
 }

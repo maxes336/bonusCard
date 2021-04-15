@@ -3,6 +3,7 @@ package com.test.bonusCard.model;
 
 import com.sun.istack.Nullable;
 import lombok.*;
+import org.hibernate.annotations.GenerationTime;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -13,15 +14,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-//@SequenceGenerator(name = "card_number_seq", initialValue = 1001, allocationSize = 100)
-@Table(name = "test")
+//@SequenceGenerator(name = "card_number_seq", initialValue = 100000)
+@Table(name = "bonus_card")
 public class BonusCard {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    /*@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "card_number_seq")
-    @Column(name = "card_number")
+    /*@Column(name = "card_number")
     private Long cardNumber;*/
 
     //@CreationTimestamp
@@ -33,10 +33,11 @@ public class BonusCard {
     @Column(name = "valid_thru")
     private String cardValidThru;
 
+    @Nullable
     @Column(name = "last_use")
-    private Timestamp cardLastUse;
+    private String cardLastUse;
 
-    private Long balance;
+    private Double balance;
 
     @OneToMany(
             mappedBy = "bonusCard",
@@ -53,18 +54,48 @@ public class BonusCard {
     @Column(name = "validity_period")
     private int validityPeriod;
 
+    /*@Column(name = "card_creator_username")
+    private String cardCreatorUsername;*/
+
+    @ManyToOne
+    @NonNull
+    //@JoinColumn(name = "card_creator")
+    private UserAccount cardCreator;
+
 
     public BonusCard(
             String cardIssueDate,
             String cardValidThru,
-            Long balance,
+            Double balance,
             String statusOfCard,
-            int validityPeriod
+            int validityPeriod,
+            UserAccount cardCreator
     ) {
         this.cardIssueDate = cardIssueDate;
         this.cardValidThru = cardValidThru;
         this.balance = balance;
         this.statusOfCard = statusOfCard;
         this.validityPeriod = validityPeriod;
+        this.cardCreator = cardCreator;
     }
+
+    @Override
+    public String toString(){
+        try {
+            return "BonusCard{" +
+                    "id=" + id +
+                    ", cardIssueDate='" + cardIssueDate + '\'' +
+                    ", cardValidThru='" + cardValidThru + '\'' +
+                    ", cardLastUse='" + cardLastUse + '\'' +
+                    ", balance=" + balance +
+                    ", transactions=" + transactions +
+                    ", statusOfCard='" + statusOfCard + '\'' +
+                    ", validityPeriod=" + validityPeriod +
+                    ", cardCreator=" + cardCreator.getUsername() +
+                    '}';
+        } catch (NullPointerException npe){
+            return "NULL HERE";
+        }
+    }
+
 }

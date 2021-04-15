@@ -28,22 +28,22 @@ public class TransactionService {
     }
 
     public void createNewTransaction(BonusCard bonusCard) {
-        Long amountOfTransaction = findAmountOfTransaction(bonusCard);
-        if (amountOfTransaction != 0) {
+        Double amountOfTransaction = findAmountOfTransaction(bonusCard);
+        if (amountOfTransaction != 0.0) {
             transactionRepository.save(new Transaction(amountOfTransaction, bonusCard));
         }
     }
 
-    public Long findAmountOfTransaction(BonusCard bonusCard) {
+    public Double findAmountOfTransaction(BonusCard bonusCard) {
         setBalanceOfCardAsZeroIfItIsNull(bonusCard);
-        Long balanceOfThisCardInRepository = bonusCardRepository.getOne(bonusCard.getId()).getBalance();
-        Long balanceOfThisCardInOperation = bonusCard.getBalance();
+        Double balanceOfThisCardInRepository = bonusCardRepository.getOne(bonusCard.getId()).getBalance();
+        Double balanceOfThisCardInOperation = bonusCard.getBalance();
         return -(balanceOfThisCardInRepository-balanceOfThisCardInOperation);
     }
 
     public void setBalanceOfCardAsZeroIfItIsNull(BonusCard bonusCard) {
         if (bonusCard.getBalance() == null) {
-            bonusCard.setBalance(0L);
+            bonusCard.setBalance(0.0);
         }
     }
 

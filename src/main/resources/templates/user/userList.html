@@ -21,14 +21,16 @@
             <tr th:each="user : ${users}">
                 <td th:text="${user.username}"></td>
                 <td th:text="${user.role}"></td>
-                <td th:text="${user.active}"></td>
-                <td><a th:href="@{user/{id}(id=${user.id})}">Change</a></td>
-                <td><a th:href="@{user/{id}(id=${user.id})}">Delete</a></td>
+                <td th:text="${user.isActive}"></td>
+                <td><a th:href="@{user-profile/{id}(id=${user.id})}">Change</a></td>
+                <td><a th:href="@{delete/{id}(id=${user.id})}">Delete</a></td>
             </tr>
             </tbody>
         </table>
     </div>
     <br>
 </div>
+<button th:onclick="location.href='http://localhost:8080/'" type="button"><-Main page</button>
+<button th:onclick="location.href='http://localhost:8080/bonusCards'" type="button">Show all bonus cards</button>
 </body>
 </html>

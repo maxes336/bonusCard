@@ -1,9 +1,15 @@
 package com.test.bonusCard.service;
 
 import com.test.bonusCard.model.BonusCard;
+import com.test.bonusCard.model.UserAccount;
 import com.test.bonusCard.repository.BonusCardRepository;
+import com.test.bonusCard.repository.UserAccountRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,49 +19,11 @@ import java.util.*;
 public class BonusCardService {
 
     private final BonusCardRepository bonusCardRepository;
+    private final UserAccountService userAccountService;
 
-    public BonusCardService(BonusCardRepository bonusCardRepository) {
+    public BonusCardService(BonusCardRepository bonusCardRepository, UserAccountService userAccountService) {
         this.bonusCardRepository = bonusCardRepository;
-    }
-
-    public List<BonusCard> findAll() {
-        List<BonusCard> allBonusCardsFromRepository = bonusCardRepository.findAll();
-        sortListOfBonusCardsById(allBonusCardsFromRepository);
-        return allBonusCardsFromRepository;
-    }
-
-    public List<BonusCard> findByValidityPeriod(int validityPeriod) {
-        if (validityPeriod != -1) {
-            List<BonusCard> bonusCardsFoundedByValidityPeriod = bonusCardRepository.findByValidityPeriod(validityPeriod);
-            sortListOfBonusCardsById(bonusCardsFoundedByValidityPeriod);
-            return bonusCardsFoundedByValidityPeriod;
-        } else {
-            return findAll();
-        }
-    }
-
-    public void saveAllNewBonusCards(BonusCard bonusCard, Integer numberOfCardsToCreate) {
-        if (numberOfCardsToCreate > 0) {
-            setDateAndTimeOfCreation(bonusCard);
-            setExpirationDateOfBonusCard(bonusCard);
-            setBalanceOfCardAsZeroIfItIsNull(bonusCard);
-            bonusCardRepository.save(bonusCard);
-            for (int i = 1; i < numberOfCardsToCreate; i++) {
-                bonusCardRepository.save(copyNewBonusCard(bonusCard));
-            }
-        }
-    }
-
-    /*public void saveOneBonusCard(BonusCard bonusCard) {
-        bonusCardRepository.save(bonusCard);
-    }*/
-
-    public void updateBonusCard(BonusCard updatedBonusCard) {
-        BonusCard originalCard = findById(updatedBonusCard.getId());
-        updatedBonusCard.setCardIssueDate(originalCard.getCardIssueDate());
-        setExpirationDateOfBonusCard(updatedBonusCard);
-        setBalanceOfCardAsZeroIfItIsNull(updatedBonusCard);
-        bonusCardRepository.save(updatedBonusCard);
+        this.userAccountService = userAccountService;
     }
 
     public BonusCard findById(Long id) {
@@ -66,22 +34,72 @@ public class BonusCardService {
         bonusCardRepository.deleteById(id);
     }
 
-    public BonusCard copyNewBonusCard(BonusCard bonusCard) {
+    public List<BonusCard> findAll() {
+        List<BonusCard> allBonusCardsFromRepository = bonusCardRepository.findAll();
+        checkAndUpdateStatusOfExpiredCardsInRepository(allBonusCardsFromRepository);
+        sortListOfBonusCardsById(allBonusCardsFromRepository);
+        return allBonusCardsFromRepository;
+    }
+
+    public List<BonusCard> findByValidityPeriod(int validityPeriod) {
+        if (validityPeriod != -1) {
+            List<BonusCard> bonusCardsFoundedByValidityPeriod = bonusCardRepository.findByValidityPeriod(validityPeriod);
+            checkAndUpdateStatusOfExpiredCardsInRepository(bonusCardsFoundedByValidityPeriod);
+            sortListOfBonusCardsById(bonusCardsFoundedByValidityPeriod);
+            return bonusCardsFoundedByValidityPeriod;
+        } else {
+            return findAll();
+        }
+    }
+
+    @Transactional
+    public void saveAllNewBonusCards(BonusCard bonusCard, Integer numberOfCardsToCreate) {
+        if (numberOfCardsToCreate > 0) {
+            setDateAndTimeOfCreation(bonusCard);
+            setExpirationDateOfBonusCard(bonusCard);
+            setBalanceOfCardAsZeroIfItIsNull(bonusCard);
+            bonusCard.setCardCreator(userAccountService.findLoggedInUserAccount());
+            for (int i = 0; i < numberOfCardsToCreate; i++) {
+                bonusCardRepository.save(copyNewBonusCard(bonusCard));
+            }
+        }
+    }
+
+    private BonusCard copyNewBonusCard(BonusCard bonusCard) {
         return new BonusCard(
                 bonusCard.getCardIssueDate(),
                 bonusCard.getCardValidThru(),
                 bonusCard.getBalance(),
                 bonusCard.getStatusOfCard(),
-                bonusCard.getValidityPeriod());
+                bonusCard.getValidityPeriod(),
+                bonusCard.getCardCreator());
     }
 
-    public void setDateAndTimeOfCreation(BonusCard bonusCard) {
+    public void updateBonusCard(BonusCard updatedBonusCard) {
+        BonusCard originalCardToUpdate = findById(updatedBonusCard.getId());
+        originalCardToUpdate.setValidityPeriod(updatedBonusCard.getValidityPeriod());
+        setExpirationDateOfBonusCard(originalCardToUpdate);
+        setBalanceOfCardAsZeroIfItIsNull(updatedBonusCard);
+        if (!originalCardToUpdate.getBalance().equals(updatedBonusCard.getBalance())) {
+            setDateAndTimeOfLastUse(originalCardToUpdate);
+            originalCardToUpdate.setBalance(updatedBonusCard.getBalance());
+        }
+        bonusCardRepository.save(originalCardToUpdate);
+    }
+
+    private void setDateAndTimeOfCreation(BonusCard bonusCard) {
         DateFormat dateFormat = new SimpleDateFormat("dd/MMM/yyyy HH:mm:ss", Locale.ENGLISH);
         Calendar cal = Calendar.getInstance();
         bonusCard.setCardIssueDate(dateFormat.format(cal.getTime()));
     }
 
-    public void setExpirationDateOfBonusCard(BonusCard bonusCard) {
+    private void setDateAndTimeOfLastUse(BonusCard bonusCard) {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MMM/yyyy HH:mm:ss", Locale.ENGLISH);
+        Calendar cal = Calendar.getInstance();
+        bonusCard.setCardLastUse(dateFormat.format(cal.getTime()));
+    }
+
+    private void setExpirationDateOfBonusCard(BonusCard bonusCard) {
         if (bonusCard.getValidityPeriod() == 0) {
             bonusCard.setCardValidThru(null);
         } else {
@@ -101,15 +119,35 @@ public class BonusCardService {
         }
     }
 
-    public void setBalanceOfCardAsZeroIfItIsNull(BonusCard bonusCard) {
+    private void setBalanceOfCardAsZeroIfItIsNull(BonusCard bonusCard) {
         if (bonusCard.getBalance() == null) {
-            bonusCard.setBalance(0L);
+            bonusCard.setBalance(0.0);
         }
     }
 
-    public void sortListOfBonusCardsById(List<BonusCard> bonusCards){
+    private void sortListOfBonusCardsById(List<BonusCard> bonusCards) {
         bonusCards.sort(Comparator.comparingLong(BonusCard::getId));
+    }
+
+    private void checkAndUpdateStatusOfExpiredCardsInRepository(List<BonusCard> allBonusCardsFromRepository) {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MMM/yyyy HH:mm:ss", Locale.ENGLISH);
+        Date currentDateAndTime = Calendar.getInstance().getTime();
+
+        Date dateAndTimeOfCardExpiration = null;
+        for (BonusCard bonusCard : allBonusCardsFromRepository) {
+            try {
+                dateAndTimeOfCardExpiration = dateFormat.parse(bonusCard.getCardValidThru());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if (currentDateAndTime.after(dateAndTimeOfCardExpiration)) {
+                bonusCard.setStatusOfCard("expired");
+                bonusCardRepository.save(bonusCard);
+            }
+        }
     }
 
 
 }
+
+

@@ -12,5 +12,4 @@ public class BonusCardApplication {
 		SpringApplication.run(BonusCardApplication.class, args);
 	}
 
-	//Transaction transaction = new Transaction(1000L, 63L);
 }
